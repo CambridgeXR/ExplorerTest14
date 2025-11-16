@@ -9,12 +9,12 @@
 <style>
   body { background-color:#000; color:#fff; font-family:Arial,sans-serif; margin:0; padding:0; text-align:center; }
   h1 { margin-top:60px; font-size:2.5em; }
-  h2 { margin-top:50px; font-size:1.8em; }
+  h2 { font-size:1.8em; margin-top:40px; }
   .section { margin-bottom:50px; }
   .dropdown-container { display:inline-block; text-align:center; margin:0 10px; }
   select { padding:10px; font-size:1em; width:200px; }
   .or-text { font-weight:bold; display:inline-block; vertical-align:middle; margin:0 10px; }
-  .go-button { padding:15px 40px; font-size:1.2em; color:#fff; background-color:#555; border:none; border-radius:8px; cursor:pointer; margin:20px 0; }
+  .go-button { padding:15px 40px; font-size:1.2em; color:#fff; background-color:#555; border:none; border-radius:8px; cursor:pointer; margin-top:20px; }
   .go-button.enabled { background-color:#4CAF50; }
   .optional-settings h2 { font-size:1.5em; margin-bottom:15px; }
   .toggle-container { display:flex; align-items:center; justify-content:center; margin:10px 0; }
@@ -82,7 +82,7 @@
   <a-camera id="camera"></a-camera>
 </a-scene>
 
-<!-- IPD SLIDER (for Safe Mode 2) -->
+<!-- IPD SLIDER (only in VR mode for Safe Mode 2) -->
 <div id="ipdSliderContainer">
   <input type="range" id="ipdSlider" min="0.05" max="0.08" step="0.001" value="0.064">
 </div>
@@ -138,6 +138,7 @@
     camera.setAttribute('camera','eyeSep',ipd);
   });
 
+  // Go button click
   goButton.addEventListener('click',()=>{
     if(!goButton.classList.contains('enabled')) return;
     const selection = audienceSelect.value||scenarioSelect.value;
