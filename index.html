@@ -1,133 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>VR Explorer</title>
-  <link rel="manifest" href="manifest.json">
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <style>
-    body {
-      background-color: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-
-    h1 { margin-top: 60px; font-size: 2.5em; }
-    h2 { margin-top: 50px; font-size: 1.8em; }
-
-    .dropdown-container { margin: 30px 0; }
-    select { padding: 10px; font-size: 1em; margin-bottom: 20px; width: 200px; }
-
-    .or-text { font-weight: bold; margin: 0 10px; display: inline-block; }
-
-    .dropdown-container div { font-weight: normal; margin-bottom: 5px; }
-
-    .go-button {
-      padding: 15px 40px;
-      font-size: 1.2em;
-      color: #fff;
-      background-color: #555;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 20px 0;
-    }
-
-    .go-button.enabled { background-color: #4CAF50; }
-
-    .optional-settings {
-      margin-top: 30px;
-      padding-top: 20px;
-    }
-
-    .optional-settings h2 { font-size: 1.5em; margin-bottom: 15px; }
-
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 10px 0;
-    }
-
-    .toggle-container input[type="checkbox"] { display: none; }
-
-    .toggle-container label {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
-      margin-left: 10px;
-      vertical-align: middle;
-    }
-
-    .toggle-container label::before {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-color: #ccc;
-      border-radius: 34px;
-      transition: 0.3s;
-    }
-
-    .toggle-container label::after {
-      content: "";
-      position: absolute;
-      left: 4px;
-      top: 4px;
-      width: 26px;
-      height: 26px;
-      background-color: white;
-      border-radius: 50%;
-      transition: 0.3s;
-    }
-
-    .toggle-container input:checked + label::before { background-color: #4CAF50; }
-    .toggle-container input:checked + label::after { transform: translateX(26px); }
-
-    footer { font-size: 0.8em; font-style: italic; margin: 40px 0 60px 0; }
-
-    a-scene { width: 100%; height: 100vh; display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VR Explorer</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+<style>
+  body { background-color:#000; color:#fff; font-family:Arial,sans-serif; margin:0; padding:0; text-align:center; }
+  h1 { margin-top:60px; font-size:2.5em; }
+  h2 { margin-top:50px; font-size:1.8em; }
+  .section { margin-bottom:50px; }
+  .dropdown-container { display:inline-block; text-align:center; margin:0 10px; }
+  select { padding:10px; font-size:1em; width:200px; }
+  .or-text { font-weight:bold; display:inline-block; vertical-align:middle; margin:0 10px; }
+  .go-button { padding:15px 40px; font-size:1.2em; color:#fff; background-color:#555; border:none; border-radius:8px; cursor:pointer; margin:20px 0; }
+  .go-button.enabled { background-color:#4CAF50; }
+  .optional-settings h2 { font-size:1.5em; margin-bottom:15px; }
+  .toggle-container { display:flex; align-items:center; justify-content:center; margin:10px 0; }
+  .toggle-container input[type="checkbox"] { display:none; }
+  .toggle-container label { position:relative; display:inline-block; width:60px; height:34px; margin-left:10px; vertical-align:middle; }
+  .toggle-container label::before { content:""; position:absolute; width:100%; height:100%; background-color:#ccc; border-radius:34px; transition:0.3s; }
+  .toggle-container label::after { content:""; position:absolute; left:4px; top:4px; width:26px; height:26px; background-color:white; border-radius:50%; transition:0.3s; }
+  .toggle-container input:checked + label::before { background-color:#4CAF50; }
+  .toggle-container input:checked + label::after { transform:translateX(26px); }
+  footer { font-size:0.8em; font-style:italic; margin:60px 0; }
+  a-scene { width:100%; height:100vh; display:none; }
+  #ipdSliderContainer { position:absolute; bottom:10%; width:100%; display:flex; justify-content:center; visibility:hidden; }
+  #ipdSliderContainer input[type=range] { width:50%; }
+</style>
 </head>
 <body>
 
-<h1>VR Explorer</h1>
-
-<h2>Step 1: Select Simulation</h2>
-
-<div class="dropdown-container">
-  <div>Presentation Audiences:</div>
-  <select id="audienceSelect">
-    <option value="">--select option--</option>
-  </select>
+<!-- MAIN TITLE -->
+<div class="section">
+  <h1>VR Explorer</h1>
 </div>
 
-<div class="or-text">or</div>
-
-<div class="dropdown-container">
-  <div>Special Scenarios:</div>
-  <select id="scenarioSelect">
-    <option value="">--select option--</option>
-  </select>
+<!-- SELECT SIMULATION -->
+<div class="section">
+  <h2>Step 1: Select Simulation</h2>
+  <div style="display:flex; justify-content:center; align-items:center; gap:5px;">
+    <div class="dropdown-container">
+      <div>Presentation Audiences:</div>
+      <select id="audienceSelect"><option value="">--select option--</option></select>
+    </div>
+    <div class="or-text">or</div>
+    <div class="dropdown-container">
+      <div>Special Scenarios:</div>
+      <select id="scenarioSelect"><option value="">--select option--</option></select>
+    </div>
+  </div>
 </div>
 
-<h2>Step 2: Enter Simulation</h2>
-<button id="goButton" class="go-button">Go</button>
+<!-- ENTER SIMULATION -->
+<div class="section">
+  <h2>Step 2: Enter Simulation</h2>
+  <button id="goButton" class="go-button">Go</button>
+</div>
 
-<div class="optional-settings">
+<!-- OPTIONAL SETTINGS -->
+<div class="section optional-settings">
   <h2>Optional Settings</h2>
-
   <div class="toggle-container">
     <span>Safe Mode 1</span>
     <input type="checkbox" id="safeMode1">
     <label for="safeMode1"></label>
   </div>
-
   <div class="toggle-container">
     <span>Safe Mode 2</span>
     <input type="checkbox" id="safeMode2">
@@ -135,29 +74,39 @@
   </div>
 </div>
 
+<!-- FOOTER -->
 <footer>VR Explorer 1.1 brought to you by Cambridge VR</footer>
 
-<a-scene id="vrScene" embedded vr-mode-ui="enterVRButton: true" renderer="antialias: true"></a-scene>
+<!-- VR SCENE -->
+<a-scene id="vrScene" embedded vr-mode-ui="enterVRButton:true" renderer="antialias:true">
+  <a-camera id="camera"></a-camera>
+</a-scene>
+
+<!-- IPD SLIDER (for Safe Mode 2) -->
+<div id="ipdSliderContainer">
+  <input type="range" id="ipdSlider" min="0.05" max="0.08" step="0.001" value="0.064">
+</div>
 
 <script>
+  // ===================== VIDEO LINKS =====================
   const audienceLinks = {
-    "Audience of 0": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N0-CF.h264.mp4", youtube: "https://youtube.com/watch?v=8D5ZJjV-9No&feature=youtu.be" },
-    "Audience of 1": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N1-CF.h264.mp4", youtube: "https://youtube.com/watch?v=L61TY-lVWYc&feature=youtu.be" },
-    "Audience of 2": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N2-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=jisLJabMOaw&feature=youtu.be" },
-    "Audience of 4": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N4-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=583YioSTgGE&feature=youtu.be" },
-    "Audience of 9": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N9-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=7AS7NEA9PFo&feature=youtu.be" },
-    "Audience of 16": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N16-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=_y-lSw1SNaU&feature=youtu.be" },
-    "Audience of 25": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N25-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=CBBwXbX5ogE" },
-    "Audience of 50": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N50-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=RUnKCfWFSfI" },
-    "Audience of 100": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N100-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=ww986pYF46E" },
-    "Audience of 500": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N500-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=S3Ve7FGfjWk" },
-    "Audience of 1000s": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N10K-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=jyUNFPBmJkA" }
+    "Audience of 0": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N0-CF.h264.mp4", youtube:"https://youtube.com/watch?v=8D5ZJjV-9No&feature=youtu.be" },
+    "Audience of 1": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N1-CF.h264.mp4", youtube:"https://youtube.com/watch?v=L61TY-lVWYc&feature=youtu.be" },
+    "Audience of 2": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N2-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=jisLJabMOaw&feature=youtu.be" },
+    "Audience of 4": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N4-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=583YioSTgGE&feature=youtu.be" },
+    "Audience of 9": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N9-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=7AS7NEA9PFo&feature=youtu.be" },
+    "Audience of 16": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N16-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=_y-lSw1SNaU&feature=youtu.be" },
+    "Audience of 25": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N25-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=CBBwXbX5ogE" },
+    "Audience of 50": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N50-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=RUnKCfWFSfI" },
+    "Audience of 100": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N100-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=ww986pYF46E" },
+    "Audience of 500": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N500-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=S3Ve7FGfjWk" },
+    "Audience of 1000s": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N10K-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=jyUNFPBmJkA" }
   };
 
   const scenarioLinks = {
-    "TV teleprompter": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/ACC01-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=3ZNddx_YNc0" },
-    "Job interview": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/JIC01-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=-tsxJfabw0s" },
-    "Radio interview": { cloudflare: "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/RIC01-CF.h264.mp4", youtube: "https://www.youtube.com/watch?v=sE3pahN4BwI" }
+    "TV teleprompter": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/ACC01-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=3ZNddx_YNc0" },
+    "Job interview": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/JIC01-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=-tsxJfabw0s" },
+    "Radio interview": { cloudflare:"https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/RIC01-CF.h264.mp4", youtube:"https://www.youtube.com/watch?v=sE3pahN4BwI" }
   };
 
   const audienceSelect = document.getElementById('audienceSelect');
@@ -165,68 +114,80 @@
   const goButton = document.getElementById('goButton');
   const safeMode1 = document.getElementById('safeMode1');
   const safeMode2 = document.getElementById('safeMode2');
+  const vrScene = document.getElementById('vrScene');
+  const ipdSliderContainer = document.getElementById('ipdSliderContainer');
+  const ipdSlider = document.getElementById('ipdSlider');
+  const camera = document.querySelector('a-camera');
 
   // Populate dropdowns
-  Object.keys(audienceLinks).forEach(name => audienceSelect.appendChild(new Option(name, name)));
-  Object.keys(scenarioLinks).forEach(name => scenarioSelect.appendChild(new Option(name, name)));
+  Object.keys(audienceLinks).forEach(k => audienceSelect.appendChild(new Option(k,k)));
+  Object.keys(scenarioLinks).forEach(k => scenarioSelect.appendChild(new Option(k,k)));
 
-  // Enable Go button if selection exists
-  function updateGoButton() {
-    goButton.classList.toggle('enabled', audienceSelect.value || scenarioSelect.value);
-  }
+  // Enable Go button when selection made
+  function updateGoButton(){ goButton.classList.toggle('enabled', audienceSelect.value||scenarioSelect.value); }
   audienceSelect.addEventListener('change', updateGoButton);
   scenarioSelect.addEventListener('change', updateGoButton);
 
-  // Only one safe mode can be selected
-  safeMode1.addEventListener('change', () => { if(safeMode1.checked) safeMode2.checked = false; });
-  safeMode2.addEventListener('change', () => { if(safeMode2.checked) safeMode1.checked = false; });
+  // Only one Safe Mode selectable
+  safeMode1.addEventListener('change',()=>{ if(safeMode1.checked) safeMode2.checked=false; });
+  safeMode2.addEventListener('change',()=>{ if(safeMode2.checked) safeMode1.checked=false; });
 
-  // Go button click
-  goButton.addEventListener('click', () => {
-    if (!goButton.classList.contains('enabled')) return;
-    const selection = audienceSelect.value || scenarioSelect.value;
-    if (!selection) return;
+  // IPD slider live update
+  ipdSlider.addEventListener('input', e=>{
+    const ipd = parseFloat(e.target.value);
+    camera.setAttribute('camera','eyeSep',ipd);
+  });
 
-    // Safe Mode 1
-    if (safeMode1.checked) {
+  goButton.addEventListener('click',()=>{
+    if(!goButton.classList.contains('enabled')) return;
+    const selection = audienceSelect.value||scenarioSelect.value;
+    if(!selection) return;
+
+    // Safe Mode 1 - YouTube
+    if(safeMode1.checked){
       const url = audienceLinks[selection]?.youtube || scenarioLinks[selection]?.youtube;
-      if (url) window.open(url, '_blank');
+      if(url) window.open(url,'_blank');
       return;
     }
 
-    // Safe Mode 2
-    if (safeMode2.checked) {
-      const url = audienceLinks[selection]?.cloudflare || scenarioLinks[selection]?.cloudflare;
-      if (url) window.location.href = url;
+    // Safe Mode 2 - Cloudflare + IPD
+    if(safeMode2.checked){
+      const videoURL = audienceLinks[selection]?.cloudflare || scenarioLinks[selection]?.cloudflare;
+      if(!videoURL) return;
+      ipdSliderContainer.style.visibility='visible';
+      loadVRVideo(videoURL);
       return;
     }
 
-    // Default VR Mode
+    // Default Mode - Cloudflare VR
     const videoURL = audienceLinks[selection]?.cloudflare || scenarioLinks[selection]?.cloudflare;
-    if (!videoURL) return;
+    if(!videoURL) return;
+    ipdSliderContainer.style.visibility='hidden';
+    loadVRVideo(videoURL);
+  });
 
-    const oldVideo = document.getElementById('vrVideo');
-    if (oldVideo) { oldVideo.pause(); oldVideo.remove(); }
-    const oldSphere = document.querySelector('a-videosphere');
-    if (oldSphere) oldSphere.remove();
+  function loadVRVideo(url){
+    const oldVideo=document.getElementById('vrVideo');
+    if(oldVideo){ oldVideo.pause(); oldVideo.remove(); }
+    const oldSphere=document.querySelector('a-videosphere');
+    if(oldSphere) oldSphere.remove();
 
-    const video = document.createElement('video');
-    video.id = 'vrVideo';
-    video.src = videoURL;
-    video.crossOrigin = 'anonymous';
-    video.loop = true;
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
+    const video=document.createElement('video');
+    video.id='vrVideo';
+    video.src=url;
+    video.crossOrigin='anonymous';
+    video.loop=true;
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
     document.body.appendChild(video);
 
-    video.play().then(() => {
-      const aScene = document.getElementById('vrScene');
-      aScene.style.display = 'block';
-      const sphere = document.createElement('a-videosphere');
-      sphere.setAttribute('src', '#vrVideo');
-      aScene.appendChild(sphere);
-    }).catch(err => console.error('Video play failed:', err));
-  });
+    video.play().then(()=>{
+      vrScene.style.display='block';
+      const sphere=document.createElement('a-videosphere');
+      sphere.setAttribute('src','#vrVideo');
+      vrScene.appendChild(sphere);
+    }).catch(err=>console.error('Video play failed:',err));
+  }
 </script>
 
 </body>
