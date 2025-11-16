@@ -2,176 +2,162 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>VR Explorer</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.5.0/aframe.min.css">
+  <link rel="icon" href="logo-192.png">
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: black;
-      color: white;
+      background-color: #000;
+      color: #fff;
       text-align: center;
     }
     h1 {
-      font-size: 3em;
-      margin-top: 40px;
+      font-size: 3rem;
+      margin-top: 2rem;
     }
     h2 {
-      font-size: 2em;
-      margin-top: 40px;
-      margin-bottom: 20px;
+      font-size: 2rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
     }
     h3 {
-      font-size: 1.5em;
-      margin-top: 30px;
-      margin-bottom: 10px;
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .section {
+      margin: 2rem auto;
+      width: 90%;
+      max-width: 600px;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: normal;
     }
     select {
-      width: 200px;
-      font-size: 1em;
-      padding: 5px;
-      margin: 5px 0;
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
     }
-    #goButton {
-      display: inline-block;
-      padding: 10px 30px;
-      margin-top: 15px;
-      font-size: 1.5em;
-      background-color: grey;
-      color: white;
+    .or {
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      background-color: #555;
+      color: #fff;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
+      cursor: not-allowed;
+      transition: background-color 0.3s;
+      margin-top: 0.5rem;
+    }
+    button.active {
+      background-color: #00ff00;
       cursor: pointer;
     }
-    #goButton.enabled {
-      background-color: green;
-    }
-    .optional-setting {
-      margin-top: 20px;
-      font-size: 1.1em;
-    }
-    .toggle-group {
+    .safe-toggle {
       display: flex;
       justify-content: center;
-      gap: 20px;
-      margin-top: 10px;
+      align-items: center;
+      margin: 1rem 0;
+      gap: 1rem;
     }
-    .toggle-label {
+    .safe-toggle label {
       display: flex;
       align-items: center;
+      gap: 0.5rem;
+      font-weight: normal;
       cursor: pointer;
     }
-    .toggle-label input {
-      display: none;
-    }
-    .toggle-slider {
-      width: 50px;
-      height: 25px;
-      background-color: #ccc;
-      border-radius: 25px;
-      position: relative;
-      margin-left: 10px;
-    }
-    .toggle-slider::before {
-      content: "";
-      position: absolute;
-      width: 23px;
-      height: 23px;
-      left: 1px;
-      top: 1px;
-      background-color: white;
-      border-radius: 50%;
-      transition: 0.3s;
-    }
-    .toggle-label input:checked + .toggle-slider::before {
-      transform: translateX(25px);
-    }
-    .toggle-label input:checked + .toggle-slider {
-      background-color: green;
-    }
-    #vrScene {
-      display: none;
-      width: 100vw;
-      height: 100vh;
-    }
-    #ipdSliderContainer {
-      display: none;
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
-      padding: 10px;
+    .safe-toggle input[type="radio"] {
+      appearance: none;
+      width: 40px;
+      height: 20px;
+      background: #555;
       border-radius: 10px;
-      color: white;
-      z-index: 1000;
+      position: relative;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    #footer {
-      font-size: 0.8em;
+    .safe-toggle input[type="radio"]:checked {
+      background: #00ff00;
+    }
+    .safe-toggle input[type="radio"]::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: left 0.3s;
+    }
+    .safe-toggle input[type="radio"]:checked::after {
+      left: 22px;
+    }
+    footer {
+      margin-top: 3rem;
+      font-size: 0.8rem;
       font-style: italic;
-      margin: 40px 0 20px 0;
     }
   </style>
 </head>
 <body>
-
-  <h1>VR Explorer</h1>
-
-  <!-- Step 1 -->
-  <h2>Step 1: Select Simulation</h2>
-  <div id="step1">
-    <div>
-      <label>Presentation Audiences:</label><br>
-      <select id="audienceSelect">
-        <option value="">--Select Option--</option>
-      </select>
-    </div>
-    <div style="margin:10px 0; font-weight:bold;">or</div>
-    <div>
-      <label>Special Scenarios:</label><br>
-      <select id="scenarioSelect">
-        <option value="">--Select Option--</option>
-      </select>
-    </div>
+  <!-- Main Title -->
+  <div class="section">
+    <h1>VR Explorer</h1>
   </div>
 
-  <!-- Step 2 -->
-  <h2>Step 2: Enter Simulation</h2>
-  <button id="goButton">Go</button>
+  <!-- Step 1: Select Simulation -->
+  <div class="section">
+    <h2>Step 1: Select Simulation</h2>
+    <label for="audience">Presentation Audiences:</label>
+    <select id="audience">
+      <option value="">--select option--</option>
+    </select>
+    <div class="or">OR</div>
+    <label for="scenario">Special Scenarios:</label>
+    <select id="scenario">
+      <option value="">--select option--</option>
+    </select>
+  </div>
+
+  <!-- Step 2: Enter Simulation -->
+  <div class="section">
+    <h2>Step 2: Enter Simulation</h2>
+    <button id="goButton">Go</button>
+  </div>
 
   <!-- Optional Settings -->
-  <div class="optional-setting">Optional Settings</div>
-  <div class="toggle-group">
-    <label class="toggle-label">Safe Mode 1
-      <input type="radio" name="safeMode" value="1">
-      <div class="toggle-slider"></div>
-    </label>
-    <label class="toggle-label">Safe Mode 2
-      <input type="radio" name="safeMode" value="2">
-      <div class="toggle-slider"></div>
-    </label>
+  <div class="section">
+    <h3>Optional Settings</h3>
+    <div class="safe-toggle">
+      <label>
+        <input type="radio" name="safeMode" value="safe1"> Safe Mode 1
+      </label>
+      <label>
+        <input type="radio" name="safeMode" value="safe2"> Safe Mode 2
+      </label>
+    </div>
   </div>
 
-  <div id="footer">
+  <!-- Footer -->
+  <footer class="section">
     VR Explorer 1.1 brought to you by Cambridge VR
-  </div>
+  </footer>
 
-  <!-- VR Scene -->
-  <a-scene id="vrScene" embedded vr-mode-ui="enterVRButton:true" renderer="antialias:true">
-    <a-assets id="assets"></a-assets>
-    <a-camera id="camera"></a-camera>
-  </a-scene>
-
-  <!-- IPD Slider -->
-  <div id="ipdSliderContainer">
-    <label>IPD: <input type="range" id="ipdSlider" min="0.05" max="0.08" step="0.001" value="0.064"></label>
-  </div>
-
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script>
-    // ---------- Video Links ----------
+    // ===== Video Links =====
     const audienceVideos = {
       "Audience of 0": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N0-CF.h264.mp4",
       "Audience of 1": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N1-CF.h264.mp4",
@@ -192,127 +178,79 @@
       "Radio interview": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/RIC01-CF.h264.mp4"
     };
 
-    const youtubeAudience = {
-      "Audience of 0": "https://www.youtube.com/watch?v=8D5ZJjV-9No&feature=youtu.be",
-      "Audience of 1": "https://www.youtube.com/watch?v=L61TY-lVWYc&feature=youtu.be",
-      "Audience of 2": "https://www.youtube.com/watch?v=jisLJabMOaw&feature=youtu.be",
-      "Audience of 4": "https://www.youtube.com/watch?v=583YioSTgGE&feature=youtu.be",
-      "Audience of 9": "https://www.youtube.com/watch?v=7AS7NEA9PFo&feature=youtu.be",
-      "Audience of 16": "https://www.youtube.com/watch?v=_y-lSw1SNaU&feature=youtu.be",
-      "Audience of 25": "https://www.youtube.com/watch?v=CBBwXbX5ogE",
-      "Audience of 50": "https://www.youtube.com/watch?v=RUnKCfWFSfI",
-      "Audience of 100": "https://www.youtube.com/watch?v=ww986pYF46E",
-      "Audience of 500": "https://www.youtube.com/watch?v=S3Ve7FGfjWk",
-      "Audience of 1000s": "https://www.youtube.com/watch?v=jyUNFPBmJkA"
-    };
+    // ===== Populate Dropdowns =====
+    const audienceSelect = document.getElementById('audience');
+    const scenarioSelect = document.getElementById('scenario');
 
-    const youtubeScenario = {
-      "TV teleprompter": "https://www.youtube.com/watch?v=3ZNddx_YNc0",
-      "Job interview": "https://www.youtube.com/watch?v=-tsxJfabw0s",
-      "Radio interview": "https://www.youtube.com/watch?v=sE3pahN4BwI"
-    };
+    Object.keys(audienceVideos).forEach(key => {
+      const option = document.createElement('option');
+      option.value = audienceVideos[key];
+      option.text = key;
+      audienceSelect.add(option);
+    });
 
-    // ---------- Populate dropdowns ----------
-    const audienceSelect = document.getElementById('audienceSelect');
-    for (let key in audienceVideos) {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = key;
-      audienceSelect.appendChild(opt);
-    }
-    const scenarioSelect = document.getElementById('scenarioSelect');
-    for (let key in scenarioVideos) {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = key;
-      scenarioSelect.appendChild(opt);
-    }
+    Object.keys(scenarioVideos).forEach(key => {
+      const option = document.createElement('option');
+      option.value = scenarioVideos[key];
+      option.text = key;
+      scenarioSelect.add(option);
+    });
 
-    // ---------- Enable Go button ----------
+    // ===== Go Button Logic =====
     const goButton = document.getElementById('goButton');
+
     function updateGoButton() {
-      if(audienceSelect.value || scenarioSelect.value) {
-        goButton.classList.add('enabled');
+      if (audienceSelect.value || scenarioSelect.value) {
+        goButton.classList.add('active');
       } else {
-        goButton.classList.remove('enabled');
+        goButton.classList.remove('active');
       }
     }
+
     audienceSelect.addEventListener('change', updateGoButton);
     scenarioSelect.addEventListener('change', updateGoButton);
 
-    // ---------- Safe Mode ----------
-    const safeRadios = document.getElementsByName('safeMode');
-    let selectedSafeMode = null;
-    safeRadios.forEach(r => r.addEventListener('change', ()=>{ selectedSafeMode=r.value; }));
+    goButton.addEventListener('click', () => {
+      if (!goButton.classList.contains('active')) return;
 
-    // ---------- VR Scene ----------
-    const vrScene = document.getElementById('vrScene');
-    const ipdContainer = document.getElementById('ipdSliderContainer');
-    const ipdSlider = document.getElementById('ipdSlider');
-    const camera = document.getElementById('camera');
+      const safeMode = document.querySelector('input[name="safeMode"]:checked')?.value;
+      const videoURL = audienceSelect.value || scenarioSelect.value;
 
-    goButton.addEventListener('click', ()=>{
-      if(!goButton.classList.contains('enabled')) return;
+      if (!videoURL) return;
 
-      let selection = audienceSelect.value || scenarioSelect.value;
-      if(!selection) return;
-
-      // Decide URL based on Safe Mode
-      let url = null;
-      if(selectedSafeMode==="1") {
-        // Safe Mode 1: YouTube
-        url = audienceVideos[selection]? youtubeAudience[selection] : youtubeScenario[selection];
-        window.open(url,'_blank');
+      // Default Mode
+      if (!safeMode) {
+        // Open in VR full screen using A-Frame
+        window.location.href = `vr.html?video=${encodeURIComponent(videoURL)}`;
         return;
-      } else if(selectedSafeMode==="2") {
-        // Safe Mode 2: Cloudflare with IPD slider
-        url = audienceVideos[selection] || scenarioVideos[selection];
-        loadVRVideo(url,true); // true = enable IPD slider in VR
-        return;
-      } else {
-        // Default mode
-        url = audienceVideos[selection] || scenarioVideos[selection];
-        loadVRVideo(url,false);
       }
-    });
 
-    function loadVRVideo(url, enableIPD=false){
-      const assets=document.getElementById('assets');
-      assets.innerHTML='';
-      const oldSphere=document.querySelector('a-videosphere');
-      if(oldSphere) oldSphere.remove();
+      // Safe Mode 1 (YouTube)
+      if (safeMode === 'safe1') {
+        const youtubeMap = {
+          "Audience of 0": "https://www.youtube.com/watch?v=8D5ZJjV-9No",
+          "Audience of 1": "https://www.youtube.com/watch?v=L61TY-lVWYc",
+          "Audience of 2": "https://www.youtube.com/watch?v=jisLJabMOaw",
+          "Audience of 4": "https://www.youtube.com/watch?v=583YioSTgGE",
+          "Audience of 9": "https://www.youtube.com/watch?v=7AS7NEA9PFo",
+          "Audience of 16": "https://www.youtube.com/watch?v=_y-lSw1SNaU",
+          "Audience of 25": "https://www.youtube.com/watch?v=CBBwXbX5ogE",
+          "Audience of 50": "https://www.youtube.com/watch?v=RUnKCfWFSfI",
+          "Audience of 100": "https://www.youtube.com/watch?v=ww986pYF46E",
+          "Audience of 500": "https://www.youtube.com/watch?v=S3Ve7FGfjWk",
+          "Audience of 1000s": "https://www.youtube.com/watch?v=jyUNFPBmJkA",
+          "TV teleprompter": "https://www.youtube.com/watch?v=3ZNddx_YNc0",
+          "Job interview": "https://www.youtube.com/watch?v=-tsxJfabw0s",
+          "Radio interview": "https://www.youtube.com/watch?v=sE3pahN4BwI"
+        };
+        window.open(youtubeMap[audienceSelect.selectedOptions[0].text] || youtubeMap[scenarioSelect.selectedOptions[0].text], '_blank');
+        return;
+      }
 
-      const video=document.createElement('video');
-      video.id='vrVideo';
-      video.src=url;
-      video.crossOrigin='anonymous';
-      video.loop=true;
-      video.autoplay=true;
-      video.setAttribute('playsinline','');
-      video.setAttribute('webkit-playsinline','');
-      video.muted=false;
-      assets.appendChild(video);
-
-      video.addEventListener('loadeddata',()=>{
-        vrScene.style.display='block';
-        const sphere=document.createElement('a-videosphere');
-        sphere.setAttribute('src','#vrVideo');
-        vrScene.appendChild(sphere);
-        video.play().catch(err=>console.error('Video play failed:',err));
-
-        if(enableIPD){
-          ipdContainer.style.display='block';
-        } else {
-          ipdContainer.style.display='none';
-        }
-      });
-    }
-
-    // ---------- IPD slider ----------
-    ipdSlider.addEventListener('input', ()=>{
-      const separation = parseFloat(ipdSlider.value);
-      camera.setAttribute('camera','userHeight:1.6;');
-      camera.getObject3D('camera').children.forEach(c=>c.position.x = (c.el==camera)?0:separation);
+      // Safe Mode 2 (IPD Slider VR)
+      if (safeMode === 'safe2') {
+        window.location.href = `vr-ipd.html?video=${encodeURIComponent(videoURL)}`;
+      }
     });
 
   </script>
