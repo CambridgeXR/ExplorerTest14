@@ -1,218 +1,255 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1220" />
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <title>VR Explorer</title>
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="data:," />
-
-  <style>
-    html,body{height:100%;margin:0;background:#071026;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    @media (orientation:portrait){
-      .landscape-warning{display:flex}
-    }
-
-    .app{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:18px;box-sizing:border-box}
-    h1{font-size:clamp(28px,6vw,48px);margin:8px 0}
-    h2{font-size:18px;margin:6px 0 16px 0;color:#cbe7ff}
-
-    .controls{display:flex;gap:12px;align-items:center;margin-bottom:18px}
-    select{padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:#fff;font-size:15px}
-
-    .footer{margin-top:auto;font-size:12px;font-style:italic;opacity:0.8;padding-bottom:6px}
-
-    .start-btn{margin-top:8px;padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,#2b8bd6,#0066cc);color:white;font-weight:600}
-
-    .player-wrap{position:fixed;inset:0;display:none;background:black;z-index:60;align-items:center;justify-content:center}
-    .player-toolbar{position:absolute;top:10px;left:10px;z-index:120}
-    .player-toolbar button{padding:8px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#fff}
-
-    .cardboard{display:flex;width:100%;height:100%;overflow:hidden}
-    .cardboard iframe{flex:1;border:0;height:100%;width:50vw}
-
-    .mono iframe{width:100%;height:100%}
-
-    .landscape-warning{position:fixed;inset:0;background:#071026;z-index:9999;display:none;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VR Explorer</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1, h2 {
+    text-align: center;
+    margin: 10px 0;
+  }
+  h1 { margin-top: 40px; }
+  select, button {
+    font-size: 1rem;
+    padding: 8px;
+    margin: 5px 0;
+  }
+  .step {
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .footer {
+    font-size: 0.75rem;
+    font-style: italic;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  .safe-mode {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+  }
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    margin-left: 10px;
+  }
+  .toggle-switch input { display:none; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top:0; left:0; right:0; bottom:0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: .4s;
+  }
+  .slider:before {
+    position: absolute;
+    content:"";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+  }
+  input:checked + .slider { background-color: #4CAF50; }
+  input:checked + .slider:before { transform: translateX(30px); }
+  #goButton:disabled { background-color: grey; color: #999; cursor: not-allowed; }
+  #goButton { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+  .dropdown-title { font-weight: normal; margin-top: 15px; }
+</style>
 </head>
 <body>
-  <div class="landscape-warning" id="landWarn">
-    <div>
-      <h1>Please rotate your device</h1>
-      <p>VR Explorer works best in landscape orientation.</p>
-    </div>
+
+<h1>VR Explorer</h1>
+
+<div class="step">
+  <h2>Step 1: Select Simulation</h2>
+
+  <div class="dropdown-title">Presentation Audiences:</div>
+  <select id="audienceSelect">
+    <option value="">--select option--</option>
+  </select>
+
+  <div style="margin: 10px 0; font-weight: bold;">or</div>
+
+  <div class="dropdown-title">Special Scenarios:</div>
+  <select id="scenarioSelect">
+    <option value="">--select option--</option>
+  </select>
+</div>
+
+<div class="step">
+  <h2>Step 2: Enter Simulation</h2>
+  <button id="goButton" disabled>Go</button>
+
+  <div class="safe-mode">
+    Laptop Safe Mode
+    <label class="toggle-switch">
+      <input type="checkbox" id="safeModeLaptop">
+      <span class="slider"></span>
+    </label>
   </div>
-
-  <main class="app" id="app">
-    <h1>VR Explorer</h1>
-    <h2>Select Simulation</h2>
-
-    <div class="controls" aria-hidden="false">
-      <div>
-        <label for="audience">Audience Sizes</label><br>
-        <select id="audience"></select>
-      </div>
-      <div>
-        <label for="scenarios">Special Scenarios</label><br>
-        <select id="scenarios"></select>
-      </div>
-      <div>
-        <button id="openBtn" class="start-btn">Open in Cardboard VR</button>
-      </div>
-    </div>
-
-    <div class="footer">VR Explorer 1.1 brought to you by Cambridge VR</div>
-  </main>
-
-  <div class="player-wrap" id="playerWrap">
-    <div class="player-toolbar">
-      <button id="exitBtn">Exit VR</button>
-    </div>
-    <div id="playerArea" class="cardboard" aria-live="polite"></div>
+  <div class="safe-mode">
+    Android Safe Mode
+    <label class="toggle-switch">
+      <input type="checkbox" id="safeModeAndroid">
+      <span class="slider"></span>
+    </label>
   </div>
+  <div class="safe-mode">
+    iPhone Safe Mode
+    <label class="toggle-switch">
+      <input type="checkbox" id="safeModeIphone">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
 
-  <script>
-    const VIDEOS = {
-      "Audience Sizes": [
-        { id: 'N0-CF', title: 'Audience of 0', url: 'https://player.virtualrealitypublicspeaking.com/?video=N0-CF' },
-        { id: 'N1-CF', title: 'Audience of 1', url: 'https://player.virtualrealitypublicspeaking.com/?video=N1-CF' },
-        { id: 'N2-CF', title: 'Audience of 2', url: 'https://player.virtualrealitypublicspeaking.com/?video=N2-CF' },
-        { id: 'N4-CF', title: 'Audience of 4', url: 'https://player.virtualrealitypublicspeaking.com/?video=N4-CF' },
-        { id: 'N9-CF', title: 'Audience of 9', url: 'https://player.virtualrealitypublicspeaking.com/?video=N9-CF' },
-        { id: 'N16-CF', title: 'Audience of 16', url: 'https://player.virtualrealitypublicspeaking.com/?video=N16-CF' },
-        { id: 'N25-CF', title: 'Audience of 25', url: 'https://player.virtualrealitypublicspeaking.com/?video=N25-CF' },
-        { id: 'N50-CF', title: 'Audience of 50', url: 'https://player.virtualrealitypublicspeaking.com/?video=N50-CF' },
-        { id: 'N100-CF', title: 'Audience of 100', url: 'https://player.virtualrealitypublicspeaking.com/?video=N100-CF' },
-        { id: 'N500-CF', title: 'Audience of 500', url: 'https://player.virtualrealitypublicspeaking.com/?video=N500-CF' },
-        { id: 'N10K-CF', title: 'Audience of 1000s', url: 'https://player.virtualrealitypublicspeaking.com/?video=N10K-CF' }
-      ],
-      "Special Scenarios": [
-        { id: 'ACC01-CF', title: 'TV teleprompter', url: 'https://player.virtualrealitypublicspeaking.com/?video=ACC01-CF' },
-        { id: 'JIC01-CF', title: 'Job interview', url: 'https://player.virtualrealitypublicspeaking.com/?video=JIC01-CF' },
-        { id: 'RIC01-CF', title: 'Radio interview', url: 'https://player.virtualrealitypublicspeaking.com/?video=RIC01-CF' }
-      ]
+<div class="footer">VR Explorer 1.1 brought to you by Cambridge VR</div>
+
+<a-scene embedded id="vrScene" vr-mode-ui="enabled: true" arjs="enabled: false" style="display:none;">
+</a-scene>
+
+<script>
+// ----------------- VIDEO LINKS -----------------
+const audienceVideos = {
+  "Audience of 0": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N0-CF.h264.mp4",
+  "Audience of 1": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N1-CF.h264.mp4",
+  "Audience of 2": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N2-CF.h264.mp4",
+  "Audience of 4": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N4-CF.h264.mp4",
+  "Audience of 9": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N9-CF.h264.mp4",
+  "Audience of 16": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N16-CF.h264.mp4",
+  "Audience of 25": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N25-CF.h264.mp4",
+  "Audience of 50": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N50-CF.h264.mp4",
+  "Audience of 100": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N100-CF.h264.mp4",
+  "Audience of 500": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N500-CF.h264.mp4",
+  "Audience of 1000s": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/N10K-CF.h264.mp4"
+};
+
+const scenarioVideos = {
+  "TV teleprompter": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/ACC01-CF.h264.mp4",
+  "Job interview": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/JIC01-CF.h264.mp4",
+  "Radio interview": "https://pub-850a8ef9d4f34159a20706a415caaaf8.r2.dev/RIC01-CF.h264.mp4"
+};
+
+// Populate dropdowns
+const audienceSelect = document.getElementById('audienceSelect');
+for(const key in audienceVideos){
+  let opt = document.createElement('option');
+  opt.value = key;
+  opt.text = key;
+  audienceSelect.appendChild(opt);
+}
+const scenarioSelect = document.getElementById('scenarioSelect');
+for(const key in scenarioVideos){
+  let opt = document.createElement('option');
+  opt.value = key;
+  opt.text = key;
+  scenarioSelect.appendChild(opt);
+}
+
+// Enable Go button only when a selection is made
+const goButton = document.getElementById('goButton');
+function updateGoState(){
+  if(audienceSelect.value || scenarioSelect.value) goButton.disabled = false;
+  else goButton.disabled = true;
+}
+audienceSelect.addEventListener('change', updateGoState);
+scenarioSelect.addEventListener('change', updateGoState);
+
+// ----------------- VR INIT -----------------
+const scene = document.getElementById('vrScene');
+goButton.addEventListener('click', async () => {
+  const selected = audienceSelect.value || scenarioSelect.value;
+  if(!selected) return;
+
+  const safeLaptop = document.getElementById('safeModeLaptop').checked;
+  const safeAndroid = document.getElementById('safeModeAndroid').checked;
+  const safeIphone = document.getElementById('safeModeIphone').checked;
+
+  let videoURL;
+  if(safeLaptop || safeAndroid){
+    // Safe Mode 1: YouTube
+    const ytLinks = {
+      ...audienceVideos, ...scenarioVideos
     };
+    videoURL = ytLinks[selected].replace('.mp4', ''); // remove .mp4 if needed
+    window.open(videoURL, '_blank');
+    return;
+  } else if(safeIphone){
+    // Safe Mode 2: iPhone hosted version
+    const iphoneLinks = {
+      "Audience of 0":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N0-CF",
+      "Audience of 1":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N1-CF",
+      "Audience of 2":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N2-CF",
+      "Audience of 4":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N4-CF",
+      "Audience of 9":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N9-CF",
+      "Audience of 16":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N16-CF",
+      "Audience of 25":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N25-CF",
+      "Audience of 50":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N50-CF",
+      "Audience of 100":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N100-CF",
+      "Audience of 500":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N500-CF",
+      "Audience of 1000s":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=N10K-CF",
+      "TV teleprompter":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=ACC01-CF",
+      "Job interview":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=JIC01-CF",
+      "Radio interview":"https://testing.virtual-reality-publics-peaking-player.pages.dev/?video=RIC01-CF"
+    };
+    window.open(iphoneLinks[selected], '_blank');
+    return;
+  } else {
+    // Default VR: Cloudflare hosted videos
+    videoURL = audienceVideos[selected] || scenarioVideos[selected];
 
-    const audienceSel = document.getElementById('audience');
-    const scenariosSel = document.getElementById('scenarios');
+    // Clear previous video if exists
+    const oldVideo = document.getElementById('vrVideo');
+    if(oldVideo) oldVideo.remove();
+    scene.innerHTML = '';
 
-    VIDEOS['Audience Sizes'].forEach(v=>{
-      const o = document.createElement('option'); 
-      o.value = v.url; 
-      o.textContent = v.title; 
-      audienceSel.appendChild(o);
-    });
+    const videoEl = document.createElement('video');
+    videoEl.src = videoURL;
+    videoEl.crossOrigin = 'anonymous';
+    videoEl.loop = true;
+    videoEl.muted = true; // required for mobile autoplay
+    videoEl.setAttribute('playsinline','true');
+    videoEl.id = 'vrVideo';
+    document.body.appendChild(videoEl);
 
-    VIDEOS['Special Scenarios'].forEach(v=>{
-      const o = document.createElement('option'); 
-      o.value = v.url; 
-      o.textContent = v.title; 
-      scenariosSel.appendChild(o);
-    });
+    videoEl.addEventListener('canplay', async () => {
+      try{
+        await videoEl.play();
+        // unmute after user interaction (Go button)
+        videoEl.muted = false;
 
-    function getSelectedURL(){
-      return audienceSel.value || scenariosSel.value;
-    }
-
-    const playerWrap = document.getElementById('playerWrap');
-    const playerArea = document.getElementById('playerArea');
-    const openBtn = document.getElementById('openBtn');
-    const exitBtn = document.getElementById('exitBtn');
-    let currentURL = null;
-
-    openBtn.addEventListener('click', ()=>{
-      const url = getSelectedURL();
-      if(!url){alert('Please select a simulation.');return}
-      currentURL = url;
-      openCardboard(url);
-    });
-
-    exitBtn.addEventListener('click', ()=>{ closeCardboard(); });
-
-    function openCardboard(url){
-      playerArea.className = 'cardboard';
-      playerArea.innerHTML = '';
-
-      const left = document.createElement('iframe');
-      const right = document.createElement('iframe');
-
-      [left,right].forEach(f => {
-        f.setAttribute('allow','autoplay; fullscreen; accelerometer; gyroscope; xr-spatial-tracking');
-        f.src = url;
-      });
-
-      playerArea.appendChild(left);
-      playerArea.appendChild(right);
-
-      playerWrap.style.display = 'flex';
-
-      if(playerWrap.requestFullscreen){
-        playerWrap.requestFullscreen().catch(()=>{});
+        const videosphere = document.createElement('a-videosphere');
+        videosphere.setAttribute('src', '#vrVideo');
+        scene.appendChild(videosphere);
+        scene.style.display = 'block';
+      } catch(err){
+        console.log('Video play error:', err);
       }
-
-      updateLandscapeWarning();
-    }
-
-    function closeCardboard(){
-      if(document.fullscreenElement){
-        document.exitFullscreen().catch(()=>{});
-      }
-      playerWrap.style.display = 'none';
-      playerArea.innerHTML = '';
-      currentURL = null;
-      window.scrollTo(0,0);
-    }
-
-    const landWarn = document.getElementById('landWarn');
-
-    function updateLandscapeWarning(){
-      if(window.matchMedia('(orientation:portrait)').matches){
-        landWarn.style.display = 'flex';
-      } else {
-        landWarn.style.display = 'none';
-      }
-    }
-
-    window.addEventListener('orientationchange', updateLandscapeWarning);
-    updateLandscapeWarning();
-
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e)=>{
-      e.preventDefault();
-      deferredPrompt = e;
-      showInstallCTA();
     });
+  }
+});
+</script>
 
-    function showInstallCTA(){
-      if(!deferredPrompt) return;
-      const btn = document.createElement('button');
-      btn.textContent = 'Install App';
-      btn.className='start-btn';
-      btn.style.marginLeft='12px';
-      btn.addEventListener('click', async ()=>{
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        btn.remove();
-      });
-      document.querySelector('.controls').appendChild(btn);
-    }
-
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('/sw.js').catch(()=>{});
-    }
-
-    if(screen.orientation && screen.orientation.lock){
-      screen.orientation.lock('landscape').catch(()=>{});
-    }
-
-    window.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') closeCardboard(); });
-  </script>
 </body>
 </html>
